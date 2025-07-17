@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Doge</title>
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+        overflow: hidden;
+      }
+      button {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px 40px;
+        font-size: 20px;
+        cursor: pointer;
+      }
+    </style>
+    <script src="cutoffs.js"></script>
+  </head>
+  <body>
+    <button id="start">Start Doge</button>
+
+    <script>
+      document.getElementById("start").addEventListener("click", async () => {
+        const btn = document.getElementById("start");
+        btn.remove();
+
+        const cutoffs = window.PACKED_CUTOFFS;
+
+        const response = await fetch("doge.bmp");
+        const blob = await response.arrayBuffer();
+
+        const audioCtx = new AudioContext();
+        await audioCtx.resume();
+
+        const audioBuffer = await audioCtx.decodeAudioData(
+          blob.slice(0, cutoffs[0])
+        );
+
+        const dogeSprites = [];
+        let offset = cutoffs[0];
+        for (let i = 1; i < cutoffs.length - 1; i++) {
+          const chunk = blob.slice(offset, offset + cutoffs[i]);
+          const url = URL.createObjectURL(
+            new Blob([chunk], { type: "image/png" })
+          );
+          dogeSprites.push(url);
+          offset += cutoffs[i];
+        }
+
+        const jsChunk = blob.slice(
+          offset,
+          offset + cutoffs[cutoffs.length - 1]
+        );
+        const jsText = new TextDecoder().decode(jsChunk);
+
+        eval(jsText);
+        window.startDogeEasterEgg(audioCtx, audioBuffer, dogeSprites);
+      });
+    </script>
+  </body>
+</html>
