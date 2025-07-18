@@ -1,5 +1,5 @@
 // This function will be eval'd and run by index.html
-window.startDogeEasterEgg = (audioCtx, audioBuffer, dogeSprites) => {
+window.startEE = (audioCtx, audioBuffer, dogeSprites) => {
   const source = audioCtx.createBufferSource();
   source.buffer = audioBuffer;
   source.loop = true; // ✅ Loop the audio!
